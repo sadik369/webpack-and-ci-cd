@@ -5,7 +5,7 @@ const App = () => {
     return (
         <div className="container">
             <h1>Hello, Webpack 5 + React!</h1>
-            <p>This app was built from scratch. test 123</p>
+            <p>This app was built from scratch. test 369</p>
         </div>
     );
 };
