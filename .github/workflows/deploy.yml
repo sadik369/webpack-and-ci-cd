@@ -1,7 +1,11 @@
-name: Deploy to GitHub Pages
+# Deploy Pipeline: Deploy to GitHub Pages when Build succeeds on main
+name: Deploy
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Build"]
+    types:
+      - completed
     branches:
       - main
 
@@ -9,33 +13,21 @@ permissions:
   contents: write
 
 jobs:
-  build-and-deploy:
+  deploy:
+    name: Deploy to GitHub Pages
     runs-on: ubuntu-latest
+    # Only run if the Build workflow succeeded (not failed or cancelled)
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
-      # ─── Step 1: Clone repo ───
-      - name: Clone repository
-        uses: actions/checkout@v4
-
-      # ─── Step 2: Build setup ───
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Download build artifact from Build
+        uses: actions/download-artifact@v4
         with:
-          node-version: 18
-          cache: 'npm'
+          name: dist
+          run-id: ${{ github.event.workflow_run.id }}
 
-      - name: Install dependencies
-        run: npm ci
-
-      # ─── Step 3: Build ───
-      - name: Build project
-        run: npm run build
-        env:
-          BASE_PATH: /webpack-and-ci-cd/
-
-      # ─── Step 4: Deploy ───
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
+          publish_dir: ./
