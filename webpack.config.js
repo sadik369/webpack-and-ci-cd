@@ -1,11 +1,15 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
+// For GitHub Pages: repo is at /webpack-and-ci-cd/ so assets must load from that path
+const basePath = process.env.BASE_PATH || "/";
+
 module.exports = {
   entry: "./src/index.js", // The entry point of your app
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "bundle.js",
+    publicPath: basePath, // Required for GitHub Pages subpath
     clean: true, // Cleans the dist folder before every build
   },
   module: {
